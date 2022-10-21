@@ -33,12 +33,11 @@
             byteArray.slice(messagePointer, messagePointer + messageLength)
           )
           const name = window.prompt(message) ?? "Human"
-          const truncatedName = name.substring(0, outputLength)
-          new TextEncoder().encodeInto(
-            truncatedName,
+          const { written } = new TextEncoder().encodeInto(
+            name,
             byteArray.subarray(outputPointer, outputPointer + outputLength)
           )
-          return truncatedName.length
+          return written
         }
       },
       env: {
