@@ -62,8 +62,8 @@ export fn _draw() void {
     };
 }
 
-// calls to @panic are sent here.
-// see https://ziglang.org/documentation/master/#panic
+// Calls to @panic are sent here.
+// See https://ziglang.org/documentation/master/#panic
 pub fn panic(message: []const u8, _: ?*builtin.StackTrace, _: ?usize) noreturn {
     env.throwError(message);
 }
