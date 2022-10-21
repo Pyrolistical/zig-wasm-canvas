@@ -9,7 +9,7 @@ pub fn throwError(message: []const u8) noreturn {
 extern "env" fn _consoleLog(pointer: [*]const u8, length: u32) void;
 pub fn consoleLog(comptime fmt: []const u8, args: anytype) void {
     const msg = std.fmt.allocPrint(allocator, fmt, args) catch
-        @panic("out of memory when attempting to allocator memory for debug message");
+        @panic("failed to allocate memory for consoleLog message");
     defer allocator.free(msg);
     consoleLog(msg.ptr, msg.len);
 }

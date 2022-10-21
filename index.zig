@@ -56,7 +56,7 @@ fn draw() !void {
 export fn _draw() void {
     draw() catch |err| {
         const message = std.fmt.allocPrint(allocator, "uncaught error {any}\n", .{err}) catch
-            @panic("failed to allocate memory when printing uncaught error");
+            @panic("failed to allocate memory for uncaught error message");
         defer allocator.free(message);
         @panic(message);
     };
