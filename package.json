@@ -8,7 +8,6 @@
     "build:zig": "zig build-lib index.zig -target wasm32-freestanding -dynamic -femit-bin=index.wasm",
     "build:vite": "vite build",
     "build": "npm run build:zig && npm run build:vite",
-    "deploy": "npm run build && git checkout pages && rm -rf assets play && mv dist/* . && git add . && git commit -m'release' && git push && git checkout master"
   },
   "author": "Ronald Chen <pyrogx1133@gmail.com>",
   "license": "Apache-2.0",
