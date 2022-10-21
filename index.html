@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zig WASM Canvas demo</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: grey;
+    }
+
+    canvas {
+      width: 400px;
+      background-color: white;
+    }
+
+  </style>
+  <script type="module">
+    import indexWasmUrl from "./index.wasm?url"
+    const canvas = document.body.querySelector("canvas")
+    const ctx = canvas.getContext("2d")
+
+    const module = await WebAssembly.compileStreaming(fetch(indexWasmUrl))
+
+
+    const instance = await WebAssembly.instantiate(module, {
+      app: {
+        _promptName(messagePointer, messageLength, outputPointer, outputLength) {
+          const byteArray = new Uint8Array(memory.buffer)
+          const message = new TextDecoder().decode(
+            byteArray.slice(messagePointer, messagePointer + messageLength)
+          )
+          const name = window.prompt(message)
+          const truncatedName = name.substring(0, outputLength)
+          new TextEncoder().encodeInto(
+            truncatedName,
+            byteArray.subarray(outputPointer | 0)
+          )
+          return truncatedName.length
+        }
+      },
+      env: {
+        _throwError(pointer, length) {
+          const byteArray = new Uint8Array(memory.buffer)
+          const message = new TextDecoder().decode(
+            byteArray.slice(pointer, pointer + length)
+          )
+          throw new Error(message)
+        },
+        _consoleLog(pointer, length) {
+          const byteArray = new Uint8Array(memory.buffer)
+          const message = new TextDecoder().decode(
+            byteArray.slice(pointer, pointer + length)
+          )
+          console.log(message)
+        },
+      },
+      ctx: {
+        save: ctx.save.bind(ctx),
+        restore: ctx.restore.bind(ctx),
+
+        translate(x, y) {
+          ctx.translate(x, y)
+        },
+        scale(x, y) {
+          ctx.scale(x, y)
+        },
+        rotate(angle) {
+          ctx.rotate(angle)
+        },
+
+        beginPath() {
+          ctx.beginPath()
+        },
+        moveTo(x, y) {
+          ctx.moveTo(x, y)
+        },
+        lineTo(x, y) {
+          ctx.lineTo(x, y)
+        },
+
+        _font(pointer, length) {
+          const byteArray = new Uint8Array(memory.buffer)
+          const style = new TextDecoder().decode(
+            byteArray.slice(pointer, pointer + length)
+          )
+          ctx.font = style
+        },
+
+        _fillStyle(pointer, length) {
+          const byteArray = new Uint8Array(memory.buffer)
+          const style = new TextDecoder().decode(
+            byteArray.slice(pointer, pointer + length)
+          )
+          ctx.fillStyle = style
+        },
+        _fillText(pointer, length, x, y) {
+          const byteArray = new Uint8Array(memory.buffer)
+          const text = new TextDecoder().decode(
+            byteArray.slice(pointer, pointer + length)
+          )
+          ctx.fillText(text, x, y)
+        },
+        fill() {
+          ctx.fill()
+        },
+
+        lineWidth(width) {
+          ctx.lineWidth = width
+        },
+        _lineCap(pointer, length) {
+          const byteArray = new Uint8Array(memory.buffer)
+          const style = new TextDecoder().decode(
+            byteArray.slice(pointer, pointer + length)
+          )
+          ctx.lineCap = style
+        },
+        _strokeStyle(pointer, length) {
+          const byteArray = new Uint8Array(memory.buffer)
+          const style = new TextDecoder().decode(
+            byteArray.slice(pointer, pointer + length)
+          )
+          ctx.strokeStyle = style
+        },
+        _strokeText(pointer, length, x, y) {
+          const byteArray = new Uint8Array(memory.buffer)
+          const text = new TextDecoder().decode(
+            byteArray.slice(pointer, pointer + length)
+          )
+          ctx.strokeText(text, x, y)
+        },
+        stroke() {
+          ctx.stroke()
+        },
+      },
+    })
+    const { memory, _draw } = instance.exports
+    _draw();
+  </script>
+</head>
+
+<body>
+  <canvas width="800" height="800">Canvas required. Please use Chrome, Firefox, or Safari</canvas>
+</body>
+
+</html>
