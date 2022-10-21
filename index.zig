@@ -19,8 +19,12 @@ fn allocPromptName(message: []const u8) !struct {
     const max_name_length = 50;
     const buffer = try allocator.alloc(u8, max_name_length);
     const length = _promptName(message.ptr, message.len, buffer.ptr, buffer.len);
-    return .{ .buffer = buffer, .name = buffer[0..length] };
+    return .{
+        .buffer = buffer,
+        .name = buffer[0..length],
+    };
 }
+
 fn draw() !void {
     {
         ctx.save();

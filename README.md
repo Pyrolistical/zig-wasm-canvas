@@ -1,6 +1,9 @@
 # zig-wasm-canvas
 
+![](screenshot.png)
+
 ### Setup
+
 1. Download [`zig 0.10.0`](https://ziglang.org/download/)
 2. Add `zig` to path.
 3. `npm run build:zig`
