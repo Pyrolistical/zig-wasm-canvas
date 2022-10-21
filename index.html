@@ -25,9 +25,7 @@
     const ctx = canvas.getContext("2d")
 
     const module = await WebAssembly.compileStreaming(fetch(indexWasmUrl))
-
-
-    const instance = await WebAssembly.instantiate(module, {
+    const { exports: { memory, _draw } } = await WebAssembly.instantiate(module, {
       app: {
         _promptName(messagePointer, messageLength, outputPointer, outputLength) {
           const byteArray = new Uint8Array(memory.buffer)
@@ -38,7 +36,7 @@
           const truncatedName = name.substring(0, outputLength)
           new TextEncoder().encodeInto(
             truncatedName,
-            byteArray.subarray(outputPointer | 0)
+            byteArray.subarray(outputPointer, outputPointer + outputLength)
           )
           return truncatedName.length
         }
@@ -138,7 +136,6 @@
         },
       },
     })
-    const { memory, _draw } = instance.exports
     _draw();
   </script>
 </head>

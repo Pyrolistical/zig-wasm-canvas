@@ -2,4 +2,4 @@ node_modules/
 .scratch~/
 dist/
 zig-cache/
-index.wasm.o
+*.wasm.o
