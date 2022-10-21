@@ -34,7 +34,7 @@
           const message = new TextDecoder().decode(
             byteArray.slice(messagePointer, messagePointer + messageLength)
           )
-          const name = window.prompt(message)
+          const name = window.prompt(message) ?? "Human"
           const truncatedName = name.substring(0, outputLength)
           new TextEncoder().encodeInto(
             truncatedName,
