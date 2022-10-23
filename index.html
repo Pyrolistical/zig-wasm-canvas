@@ -25,33 +25,49 @@
     const ctx = canvas.getContext("2d")
 
     const module = await WebAssembly.compileStreaming(fetch(indexWasmUrl))
-    const { exports: { memory, _draw, allocUint8, free } } = await WebAssembly.instantiate(module, {
+    const {
+      exports: { memory, _draw, allocUint8, free },
+    } = await WebAssembly.instantiate(module, {
       app: {
-        _promptName(messagePointer, messageLength) {
-          const messageBuffer = new Uint8Array(memory.buffer, messagePointer, messageLength)
-          const message = new TextDecoder().decode(
-            messageBuffer
+        _promptName(pointer, length) {
+          const messageBuffer = new Uint8Array(
+            memory.buffer,
+            pointer,
+            length
           )
+          const message = new TextDecoder().decode(messageBuffer)
 
           const name = window.prompt(message) ?? "Human"
 
           const nameUtf8 = new TextEncoder().encode(name)
           const namePointer = allocUint8(nameUtf8.length + 1)
-          const nameBuffer = new Uint8Array(memory.buffer, namePointer, nameUtf8.length + 1)
+          const nameBuffer = new Uint8Array(
+            memory.buffer,
+            namePointer,
+            nameUtf8.length + 1
+          )
           nameBuffer.set(nameUtf8)
           nameBuffer[nameUtf8.length] = 0
 
           return namePointer
-        }
+        },
       },
       env: {
         _throwError(pointer, length) {
-          const messageBuffer = new Uint8Array(memory.buffer, pointer, length)
+          const messageBuffer = new Uint8Array(
+            memory.buffer,
+            pointer,
+            length
+          )
           const message = new TextDecoder().decode(messageBuffer)
           throw new Error(message)
         },
         _consoleLog(pointer, length) {
-          const messageBuffer = new Uint8Array(memory.buffer, pointer, length)
+          const messageBuffer = new Uint8Array(
+            memory.buffer,
+            pointer,
+            length
+          )
           const message = new TextDecoder().decode(messageBuffer)
           console.log(message)
         },
