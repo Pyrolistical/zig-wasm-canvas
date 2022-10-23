@@ -58,10 +58,10 @@ pub fn panic(message: []const u8, _: ?*builtin.StackTrace, _: ?usize) noreturn {
     env.throwError(message);
 }
 
-export fn allocUint8(length: u32) u32 {
+export fn allocUint8(length: u32) [*]const u8 {
     const slice = allocator.alloc(u8, length) catch
         @panic("failed to allocate memory");
-    return @ptrToInt(slice.ptr);
+    return slice.ptr;
 }
 
 export fn free(pointer: [*:0]u8) void {
