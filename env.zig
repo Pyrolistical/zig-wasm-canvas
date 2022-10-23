@@ -11,5 +11,5 @@ pub fn consoleLog(comptime fmt: []const u8, args: anytype) void {
     const msg = std.fmt.allocPrint(allocator, fmt, args) catch
         @panic("failed to allocate memory for consoleLog message");
     defer allocator.free(msg);
-    consoleLog(msg.ptr, msg.len);
+    _consoleLog(msg.ptr, msg.len);
 }

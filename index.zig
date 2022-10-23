@@ -7,31 +7,23 @@ const env = @import("env.zig");
 const ctx = @import("canvas.zig");
 
 extern "app" fn _promptName(
-    messsage_pointer: [*]const u8,
+    messsage_pointer: u32,
     message_length: u32,
-    output_pointer: [*]const u8,
-    output_length: u32,
 ) u32;
-fn allocPromptName(message: []const u8) !struct {
-    buffer: []u8,
-    name: []const u8,
-} {
-    const max_name_length = 50;
-    const buffer = try allocator.alloc(u8, max_name_length);
-    const length = _promptName(message.ptr, message.len, buffer.ptr, buffer.len);
-    return .{
-        .buffer = buffer,
-        .name = buffer[0..length],
-    };
+fn allocPromptName(message: []const u8) []const u8 {
+    const name_pointer_raw = _promptName(@ptrToInt(message.ptr), message.len);
+    const name_pointer = @intToPtr([*:0]const u8, name_pointer_raw);
+    const name_length = std.mem.len(name_pointer);
+    return name_pointer[0 .. name_length - 1];
 }
 
 fn draw() !void {
     {
         ctx.save();
         defer ctx.restore();
-        const result = try allocPromptName("What is your name?");
-        defer allocator.free(result.buffer);
-        const salutation = try std.fmt.allocPrint(allocator, "Dear {s},", .{result.name});
+        const name = allocPromptName("What is your name?");
+        defer allocator.free(name);
+        const salutation = try std.fmt.allocPrint(allocator, "Dear {s},", .{name});
         defer allocator.free(salutation);
 
         ctx.font("60px cursive");
@@ -66,4 +58,14 @@ export fn _draw() void {
 // See https://ziglang.org/documentation/master/#panic
 pub fn panic(message: []const u8, _: ?*builtin.StackTrace, _: ?usize) noreturn {
     env.throwError(message);
+}
+
+export fn allocUint8(length: u32) u32 {
+    const slice = allocator.alloc(u8, length) catch
+        @panic("failed to allocate memory");
+    return @ptrToInt(slice.ptr);
+}
+
+export fn free(pointer: u32) void {
+    allocator.free(@intToPtr([]u8, pointer));
 }
