@@ -7,14 +7,12 @@ const env = @import("env.zig");
 const ctx = @import("canvas.zig");
 
 extern "app" fn _promptName(
-    messsage_pointer: u32,
+    messsage_pointer: [*]const u8,
     message_length: u32,
-) u32;
+) [*:0]u8;
 fn allocPromptName(message: []const u8) []const u8 {
-    const name_pointer_raw = _promptName(@ptrToInt(message.ptr), message.len);
-    const name_pointer = @intToPtr([*:0]const u8, name_pointer_raw);
-    const name_length = std.mem.len(name_pointer);
-    return name_pointer[0 .. name_length - 1];
+    const name_pointer = _promptName(message.ptr, message.len);
+    return std.mem.span(name_pointer);
 }
 
 fn draw() !void {
@@ -66,6 +64,6 @@ export fn allocUint8(length: u32) u32 {
     return @ptrToInt(slice.ptr);
 }
 
-export fn free(pointer: u32) void {
-    allocator.free(@intToPtr([]u8, pointer));
+export fn free(pointer: [*:0]u8) void {
+    allocator.free(std.mem.span(pointer));
 }

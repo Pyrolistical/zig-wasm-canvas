@@ -34,11 +34,10 @@
           )
           const name = window.prompt(message) ?? "Human"
           const nameUtf8 = new TextEncoder().encode(name)
-          const nameLength = nameUtf8.length + 1
+          const nameLength = nameUtf8.length
           const namePointer = allocUint8(nameLength)
           const nameBuffer = new Uint8Array(memory.buffer, namePointer, nameLength)
           nameBuffer.set(nameUtf8)
-          nameBuffer[nameLength] = 0
           return namePointer
         }
       },
