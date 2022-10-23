@@ -25,50 +25,48 @@
     const ctx = canvas.getContext("2d")
 
     const module = await WebAssembly.compileStreaming(fetch(indexWasmUrl))
+
+    const decodeString = (pointer, length) => {
+      const slice = new Uint8Array(
+        memory.buffer,
+        pointer,
+        length
+      )
+      return new TextDecoder().decode(slice)
+    }
+
+    const encodeString = (string) => {
+      const buffer = new TextEncoder().encode(string)
+      const pointer = allocUint8(buffer.length + 1)
+      const slice = new Uint8Array(
+        memory.buffer,
+        pointer,
+        buffer.length + 1
+      )
+      slice.set(buffer)
+      slice[buffer.length] = 0
+      return pointer
+    }
+
     const {
       exports: { memory, _draw, allocUint8, free },
     } = await WebAssembly.instantiate(module, {
       app: {
         _promptName(pointer, length) {
-          const messageBuffer = new Uint8Array(
-            memory.buffer,
-            pointer,
-            length
-          )
-          const message = new TextDecoder().decode(messageBuffer)
+          const message = decodeString(pointer, length)
 
           const name = window.prompt(message) ?? "Human"
 
-          const nameUtf8 = new TextEncoder().encode(name)
-          const namePointer = allocUint8(nameUtf8.length + 1)
-          const nameBuffer = new Uint8Array(
-            memory.buffer,
-            namePointer,
-            nameUtf8.length + 1
-          )
-          nameBuffer.set(nameUtf8)
-          nameBuffer[nameUtf8.length] = 0
-
-          return namePointer
+          return encodeString(name)
         },
       },
       env: {
         _throwError(pointer, length) {
-          const messageBuffer = new Uint8Array(
-            memory.buffer,
-            pointer,
-            length
-          )
-          const message = new TextDecoder().decode(messageBuffer)
+          const message = decodeString(pointer, length)
           throw new Error(message)
         },
         _consoleLog(pointer, length) {
-          const messageBuffer = new Uint8Array(
-            memory.buffer,
-            pointer,
-            length
-          )
-          const message = new TextDecoder().decode(messageBuffer)
+          const message = decodeString(pointer, length)
           console.log(message)
         },
       },
@@ -97,19 +95,14 @@
         },
 
         _font(pointer, length) {
-          const styleBuffer = new Uint8Array(memory.buffer, pointer, length)
-          const style = new TextDecoder().decode(styleBuffer)
-          ctx.font = style
+          ctx.font = decodeString(pointer, length)
         },
 
         _fillStyle(pointer, length) {
-          const styleBuffer = new Uint8Array(memory.buffer, pointer, length)
-          const style = new TextDecoder().decode(styleBuffer)
-          ctx.fillStyle = style
+          ctx.fillStyle = decodeString(pointer, length)
         },
         _fillText(pointer, length, x, y) {
-          const textBuffer = new Uint8Array(memory.buffer, pointer, length)
-          const text = new TextDecoder().decode(textBuffer)
+          const text = decodeString(pointer, length)
           ctx.fillText(text, x, y)
         },
         fill() {
@@ -120,18 +113,13 @@
           ctx.lineWidth = width
         },
         _lineCap(pointer, length) {
-          const styleBuffer = new Uint8Array(memory.buffer, pointer, length)
-          const style = new TextDecoder().decode(styleBuffer)
-          ctx.lineCap = style
+          ctx.lineCap = decodeString(pointer, length)
         },
         _strokeStyle(pointer, length) {
-          const styleBuffer = new Uint8Array(memory.buffer, pointer, length)
-          const style = new TextDecoder().decode(styleBuffer)
-          ctx.strokeStyle = style
+          ctx.strokeStyle = decodeString(pointer, length)
         },
         _strokeText(pointer, length, x, y) {
-          const textBuffer = new Uint8Array(memory.buffer, pointer, length)
-          const text = new TextDecoder().decode(textBuffer)
+          const text = decodeString(pointer, length)
           ctx.strokeText(text, x, y)
         },
         stroke() {
