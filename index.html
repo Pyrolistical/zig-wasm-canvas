@@ -32,12 +32,14 @@
           const message = new TextDecoder().decode(
             messageBuffer
           )
+
           const name = window.prompt(message) ?? "Human"
+
           const nameUtf8 = new TextEncoder().encode(name)
-          const nameLength = nameUtf8.length
-          const namePointer = allocUint8(nameLength)
-          const nameBuffer = new Uint8Array(memory.buffer, namePointer, nameLength)
+          const namePointer = allocUint8(nameUtf8.length)
+          const nameBuffer = new Uint8Array(memory.buffer, namePointer, nameUtf8.length)
           nameBuffer.set(nameUtf8)
+
           return namePointer
         }
       },
