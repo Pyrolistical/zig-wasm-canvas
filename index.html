@@ -52,7 +52,7 @@
       exports: { memory, _draw, allocUint8, free },
     } = await WebAssembly.instantiate(module, {
       app: {
-        _promptName(pointer, length) {
+        _allocPromptName(pointer, length) {
           const message = decodeString(pointer, length)
 
           const name = window.prompt(message) ?? "Human"

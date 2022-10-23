@@ -6,12 +6,12 @@ const allocator = std.heap.page_allocator;
 const env = @import("env.zig");
 const ctx = @import("canvas.zig");
 
-extern "app" fn _promptName(
+extern "app" fn _allocPromptName(
     messsage_pointer: [*]const u8,
     message_length: u32,
 ) [*:0]u8;
 fn allocPromptName(message: []const u8) []const u8 {
-    const name_pointer = _promptName(message.ptr, message.len);
+    const name_pointer = _allocPromptName(message.ptr, message.len);
     return std.mem.span(name_pointer);
 }
 
