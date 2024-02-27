@@ -7,9 +7,8 @@
     "test": "vitest",
     "build:zig": "zig build-exe index.zig -target wasm32-freestanding -femit-bin=dist/index.wasm -fno-entry --export=_draw --export=allocUint8 --export=free",
     "build:vite": "vite build",
-    "prebuild": "rm -rf dist docs && mkdir dist docs",
-    "build": "npm run build:zig && npm run build:vite",
-    "postbuild": "cp -r dist/* docs/"
+    "prebuild": "rm -rf docs && mkdir docs",
+    "build": "npm run build:zig && npm run build:vite"
   },
   "author": "Ronald Chen <pyrogx1133@gmail.com>",
   "license": "Apache-2.0",
