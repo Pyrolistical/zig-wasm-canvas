@@ -14,7 +14,7 @@ Demo showing how to call HTML canvas from zig via WebAssembly.
 
 ### Setup
 
-1. Download [`zig 0.10.0`](https://ziglang.org/download/)
+1. Download [`zig 0.12.0`](https://ziglang.org/download/)
 2. Add `zig` to path.
 3. `npm run build:zig`
 4. `npm run start`
