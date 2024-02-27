@@ -5,15 +5,17 @@
   "scripts": {
     "start": "vite --host",
     "test": "vitest",
-    "build:zig": "zig build-lib index.zig -target wasm32-freestanding -dynamic -femit-bin=index.wasm",
+    "build:zig": "zig build-exe index.zig -target wasm32-freestanding -femit-bin=dist/index.wasm -fno-entry --export=_draw --export=allocUint8 --export=free",
     "build:vite": "vite build",
-    "build": "npm run build:zig && npm run build:vite"
+    "prebuild": "rm -rf dist docs && mkdir dist docs",
+    "build": "npm run build:zig && npm run build:vite",
+    "postbuild": "cp -r dist/* docs/"
   },
   "author": "Ronald Chen <pyrogx1133@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {},
   "devDependencies": {
-    "prettier": "2.7.1",
-    "vite": "3.0.7"
+    "prettier": "3.2.5",
+    "vite": "5.1.4"
   }
 }
