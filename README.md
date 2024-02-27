@@ -4,6 +4,8 @@
 
 Demo showing how to call HTML canvas from zig via WebAssembly.
 
+[Live demo](https://pyrolistical.github.io/zig-wasm-canvas/)
+
 ### Features
 
 - Shim that makes it appear canvas ctx is in zig
